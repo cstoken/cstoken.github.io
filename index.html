@@ -28,17 +28,6 @@
 <button onclick="buyToken(10000)" disabled>10000 USDT</button>
 
 <script>
-        // 测试 Web3 是否正确加载
-        console.log(Web3);
-
-        // 等待页面加载完成
-        window.addEventListener('load', () => {
-            if (typeof Web3 !== 'undefined') {
-                document.getElementById('status').innerText = "Web3 加载成功";
-            } else {
-                document.getElementById('status').innerText = "Web3 加载失败";
-            }
-        });
     // 合约信息
     const contractAddress = "0xb67a06979Da7914e5b12Aff026c536ad30AFf44D";
     const abi = [
