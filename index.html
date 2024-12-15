@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Buy Token</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1>购买 CST 代币</h1>
+<p id="status">正在初始化...</p>
+<p>请选择支付金额（USDT）：</p>
+<button onclick="buyToken(100)" disabled>100 USDT</button>
+<button onclick="buyToken(500)" disabled>500 USDT</button>
+<button onclick="buyToken(1000)" disabled>1000 USDT</button>
+<button onclick="buyToken(10000)" disabled>10000 USDT</button>
+
+<script>
+    // 合约信息
+    const contractAddress = "0xb67a06979Da7914e5b12Aff026c536ad30AFf44D";
+    const abi = [
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "usdtAddress",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "allowance",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "needed",
+                    "type": "uint256"
+                }
+            ],
+            "name": "ERC20InsufficientAllowance",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "sender",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "balance",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "needed",
+                    "type": "uint256"
+                }
+            ],
+            "name": "ERC20InsufficientBalance",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "approver",
+                    "type": "address"
+                }
+            ],
+            "name": "ERC20InvalidApprover",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "receiver",
+                    "type": "address"
+                }
+            ],
+            "name": "ERC20InvalidReceiver",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "sender",
+                    "type": "address"
+                }
+            ],
+            "name": "ERC20InvalidSender",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                }
+            ],
+            "name": "ERC20InvalidSpender",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "owner",
+                    "type": "address"
+                }
+            ],
+            "name": "OwnableInvalidOwner",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "account",
+                    "type": "address"
+                }
+            ],
+            "name": "OwnableUnauthorizedAccount",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "token",
+                    "type": "address"
+                }
+            ],
+            "name": "SafeERC20FailedOperation",
+            "type": "error"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "owner",
+                    "type": "address"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "Approval",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "previousOwner",
+                    "type": "address"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "newOwner",
+                    "type": "address"
+                }
+            ],
+            "name": "OwnershipTransferred",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "buyer",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "usdtAmount",
+                    "type": "uint256"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "amCoinAmount",
+                    "type": "uint256"
+                }
+            ],
+            "name": "TokensPurchased",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "from",
+                    "type": "address"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "to",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "Transfer",
+            "type": "event"
+        },
+        {
+            "inputs": [],
+            "name": "AMOUNT_THRESHOLD",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "owner",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                }
+            ],
+            "name": "allowance",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "approve",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "account",
+                    "type": "address"
+                }
+            ],
+            "name": "balanceOf",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "amountUSDT",
+                    "type": "uint256"
+                }
+            ],
+            "name": "buyToken",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "decimals",
+            "outputs": [
+                {
+                    "internalType": "uint8",
+                    "name": "",
+                    "type": "uint8"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "name",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "owner",
+            "outputs": [
+                {
+                    "internalType": "address",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "renounceOwnership",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "symbol",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "totalSupply",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "to",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "transfer",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "from",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "to",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "transferFrom",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "newOwner",
+                    "type": "address"
+                }
+            ],
+            "name": "transferOwnership",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "usdtContract",
+            "outputs": [
+                {
+                    "internalType": "contract IERC20",
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "withdrawUSDT",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }
+    ];
+    const usdtAbi = [
+        {
+            "inputs": [],
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "allowance",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "needed",
+                    "type": "uint256"
+                }
+            ],
+            "name": "ERC20InsufficientAllowance",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "sender",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "balance",
+                    "type": "uint256"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "needed",
+                    "type": "uint256"
+                }
+            ],
+            "name": "ERC20InsufficientBalance",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "approver",
+                    "type": "address"
+                }
+            ],
+            "name": "ERC20InvalidApprover",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "receiver",
+                    "type": "address"
+                }
+            ],
+            "name": "ERC20InvalidReceiver",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "sender",
+                    "type": "address"
+                }
+            ],
+            "name": "ERC20InvalidSender",
+            "type": "error"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                }
+            ],
+            "name": "ERC20InvalidSpender",
+            "type": "error"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "owner",
+                    "type": "address"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "Approval",
+            "type": "event"
+        },
+        {
+            "anonymous": false,
+            "inputs": [
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "from",
+                    "type": "address"
+                },
+                {
+                    "indexed": true,
+                    "internalType": "address",
+                    "name": "to",
+                    "type": "address"
+                },
+                {
+                    "indexed": false,
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "Transfer",
+            "type": "event"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "owner",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                }
+            ],
+            "name": "allowance",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "spender",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "approve",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "account",
+                    "type": "address"
+                }
+            ],
+            "name": "balanceOf",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "decimals",
+            "outputs": [
+                {
+                    "internalType": "uint8",
+                    "name": "",
+                    "type": "uint8"
+                }
+            ],
+            "stateMutability": "pure",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "name",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "symbol",
+            "outputs": [
+                {
+                    "internalType": "string",
+                    "name": "",
+                    "type": "string"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "totalSupply",
+            "outputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "to",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "transfer",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                {
+                    "internalType": "address",
+                    "name": "from",
+                    "type": "address"
+                },
+                {
+                    "internalType": "address",
+                    "name": "to",
+                    "type": "address"
+                },
+                {
+                    "internalType": "uint256",
+                    "name": "value",
+                    "type": "uint256"
+                }
+            ],
+            "name": "transferFrom",
+            "outputs": [
+                {
+                    "internalType": "bool",
+                    "name": "",
+                    "type": "bool"
+                }
+            ],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        }
+    ];
+    const usdtAddress = "0x490e671f339aF5c8D9eDB2435B25220b3647ddcD";
+
+    let web3, contract, selectedAccount;
+
+    // 初始化合约
+    async function init() {
+        console.log("Initializing...");
+
+        if (typeof window.ethereum !== 'undefined') {
+            console.log("MetaMask is installed.");
+            try {
+                // 请求 MetaMask 连接
+                await window.ethereum.request({method: "eth_requestAccounts"});
+                web3 = new Web3(window.ethereum);
+
+                // 监听账户变化
+                window.ethereum.on('accountsChanged', handleAccountsChanged);
+                // 监听网络变化
+                window.ethereum.on('chainChanged', handleChainChanged);
+
+                // 设置当前账户并初始化合约
+                updateSelectedAccount();
+                contract = new web3.eth.Contract(abi, contractAddress);
+                console.log("已连接账户: ", selectedAccount);
+
+                // 更新状态信息并启用按钮
+                document.getElementById('status').textContent = "已连接到 MetaMask";
+                enableUiElements();
+
+                // 开始监听所有事件
+                contract.events.allEvents().on('data', (event) => {
+                    console.log("事件触发:", event);
+                });
+
+                // 监听特定事件
+                contract.events.TokensPurchased({
+                    filter: {buyer: selectedAccount}, // 可选过滤条件
+                    fromBlock: 'latest'
+                }, function (error, event) {
+                    console.log("TokensPurchased事件触发:", event);
+                });
+            } catch (error) {
+                console.error("初始化失败:", error);
+                document.getElementById('status').textContent = "无法连接到 MetaMask，请重试或解锁您的钱包。";
+            }
+        } else {
+            console.log("MetaMask is not installed.");
+            document.getElementById('status').textContent = "请安装 MetaMask 扩展！";
+        }
+    }
+
+    function handleAccountsChanged(accounts) {
+        if (accounts.length === 0) {
+            // 用户取消了连接请求或断开了钱包
+            console.log("MetaMask 账户已断开");
+            selectedAccount = null;
+            disableUiElements();
+            document.getElementById('status').textContent = "MetaMask 已断开连接";
+        } else {
+            // 更新当前账户
+            updateSelectedAccount();
+            document.getElementById('status').textContent = "2已连接账户: " + accounts[0];
+        }
+    }
+
+
+    function handleChainChanged(chainId) {
+        console.log("检测到链更改:", chainId);
+        document.getElementById('status').textContent = `请切换到正确的网络，当前 ChainId: ${chainId}`;
+        window.location.reload(); // 可选：强制刷新以重新初始化
+    }
+
+
+    function updateSelectedAccount() {
+        web3.eth.getAccounts().then((accounts) => {
+            selectedAccount = accounts[0];
+            console.log("账户已更新为:", selectedAccount);
+            if (selectedAccount) {
+                document.getElementById('status').textContent = "1已连接账户: " + selectedAccount;
+            } else {
+                document.getElementById('status').textContent = "未找到连接账户";
+            }
+        }).catch(console.error);
+    }
+
+    function enableUiElements() {
+        document.querySelectorAll('button').forEach(button => button.disabled = false);
+    }
+
+    function disableUiElements() {
+        document.querySelectorAll('button').forEach(button => button.disabled = true);
+    }
+
+    // 添加最小购买金额验证
+    function validateAmount(amount) {
+        const MINIMUM_AMOUNT = 100; // 最小购买金额
+        if (amount < MINIMUM_AMOUNT) {
+            alert(`最低购买金额为 ${MINIMUM_AMOUNT} USDT`);
+            return false;
+        }
+        return true;
+    }
+
+    // 调用 buyToken 方法
+    async function buyToken(amount) {
+        if (!contract || !selectedAccount) {
+            alert("请先连接 MetaMask");
+            return;
+        }
+
+        // 验证购买金额是否合法
+        if (!validateAmount(amount)) {
+            return;
+        }
+
+        // 将金额转换为 BigNumber 并调整到 USDT 的小数精度（假设为6）
+        const usdtDecimals = 6; // 确认 USDT 合约使用的小数位数
+        const amountWithDecimals = Web3.utils.toBN(amount).mul(Web3.utils.toBN(10).pow(Web3.utils.toBN(usdtDecimals)));
+
+        console.log("调整后购买代币，金额:", amount.toString(), "类型:", typeof amountWithDecimals);
+
+        try {
+            // **步骤 1：检查用户的 USDT 余额**
+            const usdtContract = new web3.eth.Contract(usdtAbi, usdtAddress);
+            const userBalance = await usdtContract.methods.balanceOf(selectedAccount).call();
+            if (Web3.utils.toBN(userBalance).lt(amountWithDecimals)) {
+                alert("USDT 余额不足，无法购买代币！");
+                return;
+            }
+
+            // **步骤 2：授权主合约操作 USDT**
+            const allowance = await usdtContract.methods.allowance(selectedAccount, contractAddress).call();
+            if (Web3.utils.toBN(allowance).lt(amountWithDecimals)) {
+                console.log("USDT 授权不足，开始授权...");
+                await usdtContract.methods.approve(contractAddress, amountWithDecimals).send({from: selectedAccount});
+                console.log("USDT 授权成功！");
+            } else {
+                console.log("USDT 授权已足够，无需重复授权");
+            }
+
+            // **步骤 3：调用主合约的购买方法**
+            const estimatedGas = await contract.methods.buyToken(amountWithDecimals).estimateGas({from: selectedAccount});
+            console.log(`估算的 Gas: ${estimatedGas}`);
+
+            // 提高一定比例的 gasLimit，避免估算不足
+            const tx = await contract.methods.buyToken(amountWithDecimals).send({
+                from: selectedAccount,
+                gas: Math.floor(estimatedGas * 1.2) // 提高 20% 的 Gas
+            });
+
+            alert(`成功购买 ${amount} USDT 的代币！`);
+            document.getElementById('status').textContent = `已成功购买 ${amount} USDT 的代币！`;
+
+        } catch (error) {
+            console.error("购买失败:", error);
+
+            // 解析错误原因
+            if (error.data) {
+                const revertReason = Web3.utils.toAscii(error.data);
+                console.error("回滚原因:", revertReason);
+            }
+
+            alert(`购买失败: ${error.message || '未知错误'}`);
+        }
+    }
+
+
+    // 检查是否已经授权了MetaMask
+    if (typeof window.ethereum !== 'undefined') {
+        window.ethereum.request({method: 'eth_accounts'}).then(accounts => {
+            if (accounts.length > 0) {
+                // 如果已经有授权的账户，直接调用init
+                init();
+            }
+        });
+    }
+</script>
+</body>
+</html>
