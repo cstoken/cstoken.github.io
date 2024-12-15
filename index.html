@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Buy Token</title>
-   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin-top: 50px;
         }
-
         button {
             margin: 10px;
             padding: 10px 20px;
@@ -26,10 +25,14 @@
 <button onclick="buyToken(500)" disabled>500 USDT</button>
 <button onclick="buyToken(1000)" disabled>1000 USDT</button>
 <button onclick="buyToken(10000)" disabled>10000 USDT</button>
+<button id="connect-wallet" onclick="init()">连接钱包</button>
 
+    <script src="/static/web3.min.js"></script>
 <script>
     // 合约信息
     const contractAddress = "0xb67a06979Da7914e5b12Aff026c536ad30AFf44D";
+    // const abi = ['省略不写'];
+    // const usdtAbi = ['省略不写'];
     const abi = [
         {
             "inputs": [
@@ -833,9 +836,9 @@
         if (typeof window.ethereum !== 'undefined') {
             console.log("MetaMask is installed.");
             try {
-                // 请求 MetaMask 连接
-                await window.ethereum.request({method: "eth_requestAccounts"});
+                await window.ethereum.request({ method: "eth_requestAccounts" });
                 web3 = new Web3(window.ethereum);
+
 
                 // 监听账户变化
                 window.ethereum.on('accountsChanged', handleAccountsChanged);
@@ -845,7 +848,7 @@
                 // 设置当前账户并初始化合约
                 updateSelectedAccount();
                 contract = new web3.eth.Contract(abi, contractAddress);
-                console.log("已连接账户: ", selectedAccount);
+                console.log("已连接账户:", selectedAccount);
 
                 // 更新状态信息并启用按钮
                 document.getElementById('status').textContent = "已连接到 MetaMask";
@@ -858,7 +861,7 @@
 
                 // 监听特定事件
                 contract.events.TokensPurchased({
-                    filter: {buyer: selectedAccount}, // 可选过滤条件
+                    filter: { buyer: selectedAccount }, // 可选过滤条件
                     fromBlock: 'latest'
                 }, function (error, event) {
                     console.log("TokensPurchased事件触发:", event);
@@ -873,6 +876,22 @@
         }
     }
 
+    // 立即执行的异步函数，用于在页面加载时自动调用 init 函数
+    (async () => {
+        // 页面加载时检查 MetaMask 是否已安装并且有可用账户
+        if (typeof window.ethereum !== 'undefined') {
+            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            if (accounts.length > 0) {
+                // 如果已经有授权的账户，直接调用init
+                await init();
+            } else {
+                // 显示连接钱包按钮
+                document.getElementById('connect-wallet').style.display = 'inline-block';
+            }
+        }
+    })();
+
+    // 其他辅助函数...
     function handleAccountsChanged(accounts) {
         if (accounts.length === 0) {
             // 用户取消了连接请求或断开了钱包
@@ -883,10 +902,9 @@
         } else {
             // 更新当前账户
             updateSelectedAccount();
-            document.getElementById('status').textContent = "2已连接账户: " + accounts[0];
+            document.getElementById('status').textContent = "已连接账户: " + accounts[0];
         }
     }
-
 
     function handleChainChanged(chainId) {
         console.log("检测到链更改:", chainId);
@@ -894,13 +912,12 @@
         window.location.reload(); // 可选：强制刷新以重新初始化
     }
 
-
     function updateSelectedAccount() {
         web3.eth.getAccounts().then((accounts) => {
             selectedAccount = accounts[0];
             console.log("账户已更新为:", selectedAccount);
             if (selectedAccount) {
-                document.getElementById('status').textContent = "1已连接账户: " + selectedAccount;
+                document.getElementById('status').textContent = "已连接账户: " + selectedAccount;
             } else {
                 document.getElementById('status').textContent = "未找到连接账户";
             }
@@ -908,7 +925,7 @@
     }
 
     function enableUiElements() {
-        document.querySelectorAll('button').forEach(button => button.disabled = false);
+        document.querySelectorAll('button:not(#connect-wallet)').forEach(button => button.disabled = false);
     }
 
     function disableUiElements() {
@@ -956,18 +973,18 @@
             const allowance = await usdtContract.methods.allowance(selectedAccount, contractAddress).call();
             if (Web3.utils.toBN(allowance).lt(amountWithDecimals)) {
                 console.log("USDT 授权不足，开始授权...");
-                await usdtContract.methods.approve(contractAddress, amountWithDecimals).send({from: selectedAccount});
+                await usdtContract.methods.approve(contractAddress, amountWithDecimals.toString()).send({ from: selectedAccount });
                 console.log("USDT 授权成功！");
             } else {
                 console.log("USDT 授权已足够，无需重复授权");
             }
 
             // **步骤 3：调用主合约的购买方法**
-            const estimatedGas = await contract.methods.buyToken(amountWithDecimals).estimateGas({from: selectedAccount});
+            const estimatedGas = await contract.methods.buyToken(amountWithDecimals.toString()).estimateGas({ from: selectedAccount });
             console.log(`估算的 Gas: ${estimatedGas}`);
 
             // 提高一定比例的 gasLimit，避免估算不足
-            const tx = await contract.methods.buyToken(amountWithDecimals).send({
+            const tx = await contract.methods.buyToken(amountWithDecimals.toString()).send({
                 from: selectedAccount,
                 gas: Math.floor(estimatedGas * 1.2) // 提高 20% 的 Gas
             });
@@ -986,17 +1003,6 @@
 
             alert(`购买失败: ${error.message || '未知错误'}`);
         }
-    }
-
-
-    // 检查是否已经授权了MetaMask
-    if (typeof window.ethereum !== 'undefined') {
-        window.ethereum.request({method: 'eth_accounts'}).then(accounts => {
-            if (accounts.length > 0) {
-                // 如果已经有授权的账户，直接调用init
-                init();
-            }
-        });
     }
 </script>
 </body>
