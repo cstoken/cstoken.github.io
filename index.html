@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>购买 CST 代币</title>
+    <title>兑换CST</title>
     <!-- 引入 Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- 引入 Google Fonts -->
@@ -46,7 +46,7 @@
 </head>
 <body>
 <div class="container">
-    <h1 class="text-center">购买 CST 代币</h1>
+    <h1 class="text-center">兑换CST</h1>
     <p id="status" class="text-center">正在初始化...</p>
 
     <!-- 消息显示区域 -->
@@ -924,7 +924,7 @@
                     if (chainId !== '0x1') { // 主网 Chain ID
                         document.getElementById('status').textContent = '请切换到以太坊主网';
                         showMessage('请切换到以太坊主网', 'error');
-                        disableUiElements(); // 禁用所有购买按钮
+                        disableUiElements(); // 禁用所有兑换按钮
                         return;
                     }
                 }
@@ -1005,11 +1005,11 @@
         enablePurchaseButtons(true);
     }
 
-    // 添加最小购买金额验证
+    // 添加最小兑换金额验证
     function validateAmount(amount) {
-        const MINIMUM_AMOUNT = 100; // 最小购买金额
+        const MINIMUM_AMOUNT = 100; // 最小兑换金额
         if (amount < MINIMUM_AMOUNT) {
-            showMessage(`最低购买金额为 ${MINIMUM_AMOUNT} USDT`, 'error');
+            showMessage(`最低兑换金额为 ${MINIMUM_AMOUNT} USDT`, 'error');
             return false;
         }
         return true;
@@ -1022,7 +1022,7 @@
             return;
         }
 
-        // 验证购买金额是否合法
+        // 验证兑换金额是否合法
         if (!validateAmount(amount)) {
             return;
         }
@@ -1031,14 +1031,14 @@
         const usdtDecimals = 6; // 确认 USDT 合约使用的小数位数
         const amountWithDecimals = Web3.utils.toBN(amount).mul(Web3.utils.toBN(10).pow(Web3.utils.toBN(usdtDecimals)));
 
-        console.log("调整后购买代币，金额:", amount.toString(), "类型:", typeof amountWithDecimals);
+        console.log("调整后兑换金额:", amount.toString(), "类型:", typeof amountWithDecimals);
 
         try {
             // **步骤 1：检查用户的 USDT 余额**
             const usdtContract = new web3.eth.Contract(usdtAbi, usdtAddress);
             const userBalance = await usdtContract.methods.balanceOf(selectedAccount).call();
             if (Web3.utils.toBN(userBalance).lt(amountWithDecimals)) {
-                showMessage("USDT 余额不足，无法购买代币！", 'error');
+                showMessage("USDT 余额不足，无法兑换！", 'error');
                 return;
             }
 
@@ -1052,7 +1052,7 @@
                 console.log("USDT 授权已足够，无需重复授权");
             }
 
-            // **步骤 3：调用主合约的购买方法**
+            // **步骤 3：调用主合约的兑换方法**
             const estimatedGas = await contract.methods.buyToken(amountWithDecimals.toString()).estimateGas({from: selectedAccount});
             console.log(`估算的 Gas: ${estimatedGas}`);
 
@@ -1062,11 +1062,11 @@
                 gas: Math.floor(estimatedGas * 1.2) // 提高 20% 的 Gas
             });
 
-            showMessage(`成功购买 ${amount} USDT 的代币！`, 'success');
-            document.getElementById('status').textContent = `已成功购买 ${amount} USDT 的代币！`;
+            showMessage(`成功兑换 ${amount} 的CST！`, 'success');
+            document.getElementById('status').textContent = `已成功兑换 ${amount} CST！`;
 
         } catch (error) {
-            console.error("购买失败:", error);
+            console.error("兑换失败:", error);
 
             // 解析错误原因
             if (error.data) {
@@ -1074,7 +1074,7 @@
                 console.error("回滚原因:", revertReason);
             }
 
-            showMessage(`购买失败: ${error.message || '未知错误'}`, 'error');
+            showMessage(`兑换失败: ${error.message || '未知错误'}`, 'error');
         }
     }
 </script>
