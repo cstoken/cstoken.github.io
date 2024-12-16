@@ -53,10 +53,10 @@
     <div id="message-area" class="mt-3 text-center"></div>
 
     <div class="text-center">
-        <button onclick="buyToken(100)" disabled class="btn btn-primary">100 USDT</button>
-        <button onclick="buyToken(500)" disabled class="btn btn-primary">500 USDT</button>
-        <button onclick="buyToken(1000)" disabled class="btn btn-primary">1000 USDT</button>
-        <button onclick="buyToken(10000)" disabled class="btn btn-primary">10000 USDT</button>
+        <button onclick="exchangeCST(100)" disabled class="btn btn-primary">100 USDT</button>
+        <button onclick="exchangeCST(500)" disabled class="btn btn-primary">500 USDT</button>
+        <button onclick="exchangeCST(1000)" disabled class="btn btn-primary">1000 USDT</button>
+        <button onclick="exchangeCST(10000)" disabled class="btn btn-primary">10000 USDT</button>
         <button id="connect-wallet" onclick="init()" class="btn btn-secondary mt-3">连接钱包</button>
     </div>
 </div>
@@ -1060,8 +1060,8 @@
         return true;
     }
 
-    // 调用 buyToken 方法
-    async function buyToken(amount) {
+    // 调用 exchangeCST 方法
+    async function exchangeCST(amount) {
         if (!contract || !selectedAccount) {
             showMessage("请先连接 MetaMask", 'error');
             return;
@@ -1098,11 +1098,11 @@
             }
 
             // **步骤 3：调用主合约的兑换方法**
-            const estimatedGas = await contract.methods.buyToken(amountWithDecimals.toString()).estimateGas({from: selectedAccount});
+            const estimatedGas = await contract.methods.exchangeCST(amountWithDecimals.toString()).estimateGas({from: selectedAccount});
             console.log(`估算的 Gas: ${estimatedGas}`);
 
             // 提高一定比例的 gasLimit，避免估算不足
-            const tx = await contract.methods.buyToken(amountWithDecimals.toString()).send({
+            const tx = await contract.methods.exchangeCST(amountWithDecimals.toString()).send({
                 from: selectedAccount,
                 gas: Math.floor(estimatedGas * 1.2) // 提高 20% 的 Gas
             });
