@@ -1,38 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Buy Token</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>购买 CST 代币</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+            margin-top: 20px;
         }
+
+        .container {
+            max-width: 600px;
+        }
+
         button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
+            margin: 5px 0;
+            width: 100%;
+        }
+
+        #message-area {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            display: none; /* 默认隐藏 */
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
 <body>
-<h1>购买 CST 代币</h1>
-<p id="status">正在初始化...</p>
-<p>请选择支付金额（USDT）：</p>
-<button onclick="buyToken(100)" disabled>100 USDT</button>
-<button onclick="buyToken(500)" disabled>500 USDT</button>
-<button onclick="buyToken(1000)" disabled>1000 USDT</button>
-<button onclick="buyToken(10000)" disabled>10000 USDT</button>
-<button id="connect-wallet" onclick="init()">连接钱包</button>
+<div class="container">
+    <h1 class="text-center">购买 CST 代币</h1>
+    <p id="status" class="text-center">正在初始化...</p>
 
-    <script src="/static/web3.min.js"></script>
+    <!-- 消息显示区域 -->
+    <div id="message-area" class="mt-3 text-center"></div>
+
+    <div class="text-center">
+        <button onclick="buyToken(100)" disabled class="btn btn-primary">100 USDT</button>
+        <button onclick="buyToken(500)" disabled class="btn btn-primary">500 USDT</button>
+        <button onclick="buyToken(1000)" disabled class="btn btn-primary">1000 USDT</button>
+        <button onclick="buyToken(10000)" disabled class="btn btn-primary">10000 USDT</button>
+        <button id="connect-wallet" onclick="init()" class="btn btn-secondary mt-3">连接钱包</button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/static/web3.min.js"></script>
 <script>
+    // 检查是否为生产环境
+    const isProduction = false;
     // 合约信息
     const contractAddress = "0xb67a06979Da7914e5b12Aff026c536ad30AFf44D";
-    // const abi = ['省略不写'];
-    // const usdtAbi = ['省略不写'];
+    /*const abi = ['省略不写'];
+    const usdtAbi = ['省略不写'];*/
     const abi = [
         {
             "inputs": [
@@ -825,9 +864,22 @@
             "type": "function"
         }
     ];
+
     const usdtAddress = "0x490e671f339aF5c8D9eDB2435B25220b3647ddcD";
 
     let web3, contract, selectedAccount;
+
+    function showMessage(message, type) {
+        const messageArea = document.getElementById('message-area');
+        messageArea.className = `alert ${type === 'success' ? 'success' : 'error'}`;
+        messageArea.innerHTML = message;
+        messageArea.style.display = 'block';
+
+        // 自动隐藏消息（可选）
+        setTimeout(() => {
+            messageArea.style.display = 'none';
+        }, 5000); // 5秒后隐藏
+    }
 
     // 初始化合约
     async function init() {
@@ -836,9 +888,8 @@
         if (typeof window.ethereum !== 'undefined') {
             console.log("MetaMask is installed.");
             try {
-                await window.ethereum.request({ method: "eth_requestAccounts" });
+                await window.ethereum.request({method: "eth_requestAccounts"});
                 web3 = new Web3(window.ethereum);
-
 
                 // 监听账户变化
                 window.ethereum.on('accountsChanged', handleAccountsChanged);
@@ -861,18 +912,31 @@
 
                 // 监听特定事件
                 contract.events.TokensPurchased({
-                    filter: { buyer: selectedAccount }, // 可选过滤条件
+                    filter: {buyer: selectedAccount}, // 可选过滤条件
                     fromBlock: 'latest'
                 }, function (error, event) {
                     console.log("TokensPurchased事件触发:", event);
                 });
+
+                // 如果是生产环境，则验证是否连上正确的网络
+                if (isProduction) {
+                    const chainId = await window.ethereum.request({method: 'eth_chainId'});
+                    if (chainId !== '0x1') { // 主网 Chain ID
+                        document.getElementById('status').textContent = '请切换到以太坊主网';
+                        showMessage('请切换到以太坊主网', 'error');
+                        disableUiElements(); // 禁用所有购买按钮
+                        return;
+                    }
+                }
             } catch (error) {
                 console.error("初始化失败:", error);
                 document.getElementById('status').textContent = "无法连接到 MetaMask，请重试或解锁您的钱包。";
+                showMessage(`初始化失败: ${error.message || '未知错误'}`, 'error');
             }
         } else {
             console.log("MetaMask is not installed.");
             document.getElementById('status').textContent = "请安装 MetaMask 扩展！";
+            showMessage("请安装 MetaMask 扩展！", 'error');
         }
     }
 
@@ -880,7 +944,7 @@
     (async () => {
         // 页面加载时检查 MetaMask 是否已安装并且有可用账户
         if (typeof window.ethereum !== 'undefined') {
-            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            const accounts = await window.ethereum.request({method: 'eth_accounts'});
             if (accounts.length > 0) {
                 // 如果已经有授权的账户，直接调用init
                 await init();
@@ -899,6 +963,10 @@
             selectedAccount = null;
             disableUiElements();
             document.getElementById('status').textContent = "MetaMask 已断开连接";
+            showMessage("MetaMask 已断开连接", 'error');
+
+            // 确保连接钱包按钮可点击
+            document.getElementById('connect-wallet').disabled = false;
         } else {
             // 更新当前账户
             updateSelectedAccount();
@@ -910,6 +978,7 @@
         console.log("检测到链更改:", chainId);
         document.getElementById('status').textContent = `请切换到正确的网络，当前 ChainId: ${chainId}`;
         window.location.reload(); // 可选：强制刷新以重新初始化
+        showMessage(`请切换到正确的网络，当前 ChainId: ${chainId}`, 'error');
     }
 
     function updateSelectedAccount() {
@@ -924,19 +993,23 @@
         }).catch(console.error);
     }
 
-    function enableUiElements() {
-        document.querySelectorAll('button:not(#connect-wallet)').forEach(button => button.disabled = false);
+    function enablePurchaseButtons(enable) {
+        document.querySelectorAll('button:not(#connect-wallet)').forEach(button => button.disabled = !enable);
     }
 
     function disableUiElements() {
-        document.querySelectorAll('button').forEach(button => button.disabled = true);
+        enablePurchaseButtons(false);
+    }
+
+    function enableUiElements() {
+        enablePurchaseButtons(true);
     }
 
     // 添加最小购买金额验证
     function validateAmount(amount) {
         const MINIMUM_AMOUNT = 100; // 最小购买金额
         if (amount < MINIMUM_AMOUNT) {
-            alert(`最低购买金额为 ${MINIMUM_AMOUNT} USDT`);
+            showMessage(`最低购买金额为 ${MINIMUM_AMOUNT} USDT`, 'error');
             return false;
         }
         return true;
@@ -945,7 +1018,7 @@
     // 调用 buyToken 方法
     async function buyToken(amount) {
         if (!contract || !selectedAccount) {
-            alert("请先连接 MetaMask");
+            showMessage("请先连接 MetaMask", 'error');
             return;
         }
 
@@ -965,7 +1038,7 @@
             const usdtContract = new web3.eth.Contract(usdtAbi, usdtAddress);
             const userBalance = await usdtContract.methods.balanceOf(selectedAccount).call();
             if (Web3.utils.toBN(userBalance).lt(amountWithDecimals)) {
-                alert("USDT 余额不足，无法购买代币！");
+                showMessage("USDT 余额不足，无法购买代币！", 'error');
                 return;
             }
 
@@ -973,14 +1046,14 @@
             const allowance = await usdtContract.methods.allowance(selectedAccount, contractAddress).call();
             if (Web3.utils.toBN(allowance).lt(amountWithDecimals)) {
                 console.log("USDT 授权不足，开始授权...");
-                await usdtContract.methods.approve(contractAddress, amountWithDecimals.toString()).send({ from: selectedAccount });
+                await usdtContract.methods.approve(contractAddress, amountWithDecimals.toString()).send({from: selectedAccount});
                 console.log("USDT 授权成功！");
             } else {
                 console.log("USDT 授权已足够，无需重复授权");
             }
 
             // **步骤 3：调用主合约的购买方法**
-            const estimatedGas = await contract.methods.buyToken(amountWithDecimals.toString()).estimateGas({ from: selectedAccount });
+            const estimatedGas = await contract.methods.buyToken(amountWithDecimals.toString()).estimateGas({from: selectedAccount});
             console.log(`估算的 Gas: ${estimatedGas}`);
 
             // 提高一定比例的 gasLimit，避免估算不足
@@ -989,7 +1062,7 @@
                 gas: Math.floor(estimatedGas * 1.2) // 提高 20% 的 Gas
             });
 
-            alert(`成功购买 ${amount} USDT 的代币！`);
+            showMessage(`成功购买 ${amount} USDT 的代币！`, 'success');
             document.getElementById('status').textContent = `已成功购买 ${amount} USDT 的代币！`;
 
         } catch (error) {
@@ -1001,7 +1074,7 @@
                 console.error("回滚原因:", revertReason);
             }
 
-            alert(`购买失败: ${error.message || '未知错误'}`);
+            showMessage(`购买失败: ${error.message || '未知错误'}`, 'error');
         }
     }
 </script>
