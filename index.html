@@ -53,10 +53,10 @@
     <div id="message-area" class="mt-3 text-center"></div>
 
     <div class="text-center">
-        <button onclick="exchangeCST(100)" disabled class="btn btn-primary">100 USDT</button>
-        <button onclick="exchangeCST(500)" disabled class="btn btn-primary">500 USDT</button>
-        <button onclick="exchangeCST(1000)" disabled class="btn btn-primary">1000 USDT</button>
-        <button onclick="exchangeCST(10000)" disabled class="btn btn-primary">10000 USDT</button>
+        <button onclick="exchangeCST(100)" disabled class="btn btn-primary">1CST(100 USDT)</button>
+        <button onclick="exchangeCST(500)" disabled class="btn btn-primary">5CST(500 USDT)</button>
+        <button onclick="exchangeCST(5000)" disabled class="btn btn-primary">50CST(5000 USDT)</button>
+        <button onclick="exchangeCST(10000)" disabled class="btn btn-primary">100CST(10000 USDT)</button>
         <button id="connect-wallet" onclick="init()" class="btn btn-secondary mt-3">连接钱包</button>
     </div>
 </div>
@@ -68,875 +68,66 @@
 <script>
     // 检查是否为生产环境
     const isProduction = false;
-    // 合约信息
-    const contractAddress = "0xAde7440f620922Eef83F5E62bF0eDd81F3Fc3e70";
-    /*const abi = ['省略不写'];
-    const usdtAbi = ['省略不写'];*/
-    const abi = [
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "usdtAddress",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "allowance",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "needed",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC20InsufficientAllowance",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "balance",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "needed",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC20InsufficientBalance",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "approver",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidApprover",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "receiver",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidReceiver",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidSender",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidSpender",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			}
-		],
-		"name": "OwnableInvalidOwner",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "OwnableUnauthorizedAccount",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "token",
-				"type": "address"
-			}
-		],
-		"name": "SafeERC20FailedOperation",
-		"type": "error"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Approval",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "CSTWithdrawn",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "previousOwner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "OwnershipTransferred",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "buyer",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "usdtAmount",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "cstAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "TokensPurchased",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Transfer",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"name": "USDTWithdrawn",
-		"type": "event"
-	},
-	{
-		"inputs": [],
-		"name": "AMOUNT_THRESHOLD",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			}
-		],
-		"name": "allowance",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "balanceOf",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "conversionRate",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "decimals",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "amountUSDT",
-				"type": "uint256"
-			}
-		],
-		"name": "exchangeCST",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "name",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "newRate",
-				"type": "uint256"
-			}
-		],
-		"name": "setConversionRate",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "symbol",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalSupply",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "transfer",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "transferFrom",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "usdtContract",
-		"outputs": [
-			{
-				"internalType": "contract IERC20",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "withdrawCST",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "withdrawUSDT",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	}
-];
-    const usdtAbi = [
-        {
-            "inputs": [],
-            "stateMutability": "nonpayable",
-            "type": "constructor"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "spender",
-                    "type": "address"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "allowance",
-                    "type": "uint256"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "needed",
-                    "type": "uint256"
-                }
-            ],
-            "name": "ERC20InsufficientAllowance",
-            "type": "error"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "sender",
-                    "type": "address"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "balance",
-                    "type": "uint256"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "needed",
-                    "type": "uint256"
-                }
-            ],
-            "name": "ERC20InsufficientBalance",
-            "type": "error"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "approver",
-                    "type": "address"
-                }
-            ],
-            "name": "ERC20InvalidApprover",
-            "type": "error"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "receiver",
-                    "type": "address"
-                }
-            ],
-            "name": "ERC20InvalidReceiver",
-            "type": "error"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "sender",
-                    "type": "address"
-                }
-            ],
-            "name": "ERC20InvalidSender",
-            "type": "error"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "spender",
-                    "type": "address"
-                }
-            ],
-            "name": "ERC20InvalidSpender",
-            "type": "error"
-        },
-        {
-            "anonymous": false,
-            "inputs": [
-                {
-                    "indexed": true,
-                    "internalType": "address",
-                    "name": "owner",
-                    "type": "address"
-                },
-                {
-                    "indexed": true,
-                    "internalType": "address",
-                    "name": "spender",
-                    "type": "address"
-                },
-                {
-                    "indexed": false,
-                    "internalType": "uint256",
-                    "name": "value",
-                    "type": "uint256"
-                }
-            ],
-            "name": "Approval",
-            "type": "event"
-        },
-        {
-            "anonymous": false,
-            "inputs": [
-                {
-                    "indexed": true,
-                    "internalType": "address",
-                    "name": "from",
-                    "type": "address"
-                },
-                {
-                    "indexed": true,
-                    "internalType": "address",
-                    "name": "to",
-                    "type": "address"
-                },
-                {
-                    "indexed": false,
-                    "internalType": "uint256",
-                    "name": "value",
-                    "type": "uint256"
-                }
-            ],
-            "name": "Transfer",
-            "type": "event"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "owner",
-                    "type": "address"
-                },
-                {
-                    "internalType": "address",
-                    "name": "spender",
-                    "type": "address"
-                }
-            ],
-            "name": "allowance",
-            "outputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "spender",
-                    "type": "address"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "value",
-                    "type": "uint256"
-                }
-            ],
-            "name": "approve",
-            "outputs": [
-                {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
-                }
-            ],
-            "stateMutability": "nonpayable",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "account",
-                    "type": "address"
-                }
-            ],
-            "name": "balanceOf",
-            "outputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [],
-            "name": "decimals",
-            "outputs": [
-                {
-                    "internalType": "uint8",
-                    "name": "",
-                    "type": "uint8"
-                }
-            ],
-            "stateMutability": "pure",
-            "type": "function"
-        },
-        {
-            "inputs": [],
-            "name": "name",
-            "outputs": [
-                {
-                    "internalType": "string",
-                    "name": "",
-                    "type": "string"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [],
-            "name": "symbol",
-            "outputs": [
-                {
-                    "internalType": "string",
-                    "name": "",
-                    "type": "string"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [],
-            "name": "totalSupply",
-            "outputs": [
-                {
-                    "internalType": "uint256",
-                    "name": "",
-                    "type": "uint256"
-                }
-            ],
-            "stateMutability": "view",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "to",
-                    "type": "address"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "value",
-                    "type": "uint256"
-                }
-            ],
-            "name": "transfer",
-            "outputs": [
-                {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
-                }
-            ],
-            "stateMutability": "nonpayable",
-            "type": "function"
-        },
-        {
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "name": "from",
-                    "type": "address"
-                },
-                {
-                    "internalType": "address",
-                    "name": "to",
-                    "type": "address"
-                },
-                {
-                    "internalType": "uint256",
-                    "name": "value",
-                    "type": "uint256"
-                }
-            ],
-            "name": "transferFrom",
-            "outputs": [
-                {
-                    "internalType": "bool",
-                    "name": "",
-                    "type": "bool"
-                }
-            ],
-            "stateMutability": "nonpayable",
-            "type": "function"
-        }
-    ];
 
-    const usdtAddress = "0x490e671f339aF5c8D9eDB2435B25220b3647ddcD";
+    let cstAbi, usdtAbi, contractAddress, usdtAddress;
+
+    async function loadConfig() {
+        try {
+            // 获取当前网络 ID
+            const networkId = await web3.eth.net.getId();
+
+            // 根据网络 ID 加载对应的 ABI文件，合约地址
+            const networkConfig = {
+                1: { // 以太坊主网
+                    usdtAddress: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+                    contractAddress: "",
+                    cstAbiPath: "/static/abi_cst_eth.json",
+                    usdtAbiPath: "/static/abi_usdt_eth.json"
+                },
+                11155111: { // 以太坊测试网
+                    usdtAddress: "0x490e671f339aF5c8D9eDB2435B25220b3647ddcD",
+                    contractAddress: "0xAde7440f620922Eef83F5E62bF0eDd81F3Fc3e70",
+                    cstAbiPath: "/static/abi_cst_eth_test.json",
+                    usdtAbiPath: "/static/abi_usdt_eth_test.json"
+                },
+                56: { // 币安链主网
+                    usdtAddress: "0x55d398326f99059ff775485246999027b3197955",
+                    contractAddress: "",
+                    cstAbiPath: "/static/abi_cst_ba.json",
+                    usdtAbiPath: "/static/abi_usdt_ba.json"
+                },
+                97: { // 币安链测试网
+                    usdtAddress: "0xE7A518efB34F44921558f19c3BF0fC8E8B3f87DA",
+                    contractAddress: "0x4D5Adda98824e60b87C11B3B697522A3810a63B5",
+                    cstAbiPath: "/static/abi_cst_ba_test.json",
+                    usdtAbiPath: "/static/abi_usdt_ba_test.json"
+                }
+            };
+
+            const config = networkConfig[networkId];
+            if (config) {
+                // 设置 USDT 地址
+                usdtAddress = config.usdtAddress;
+                // 设置合约地址
+                contractAddress = config.contractAddress;
+
+                // 加载 ABI 文件
+                const [responseCstAbi, responseUSDTAbi] = await Promise.all([
+                    fetch(config.cstAbiPath),
+                    fetch(config.usdtAbiPath)
+                ]);
+
+                cstAbi = await responseCstAbi.json();
+                usdtAbi = await responseUSDTAbi.json();
+
+            } else {
+                showMessage("当前网络不支持 USDT 兑换，请切换到以太坊或币安链主网", 'error');
+            }
+        } catch (error) {
+            console.error("加载 ABI 文件时出错:", error);
+            showMessage("加载 ABI 文件失败，请检查网络或文件路径", 'error');
+        }
+    }
 
     let web3, contract, selectedAccount;
 
@@ -956,6 +147,8 @@
     async function init() {
         console.log("Initializing...");
 
+        await loadConfig(); // 加载配置文件
+
         if (typeof window.ethereum !== 'undefined') {
             console.log("MetaMask is installed.");
             try {
@@ -969,7 +162,7 @@
 
                 // 设置当前账户并初始化合约
                 updateSelectedAccount();
-                contract = new web3.eth.Contract(abi, contractAddress);
+                contract = new web3.eth.Contract(cstAbi, contractAddress);
                 console.log("已连接账户:", selectedAccount);
 
                 // 更新状态信息并启用按钮
@@ -992,11 +185,17 @@
                 // 如果是生产环境，则验证是否连上正确的网络
                 if (isProduction) {
                     const chainId = await window.ethereum.request({method: 'eth_chainId'});
-                    if (chainId !== '0x1') { // 主网 Chain ID
-                        document.getElementById('status').textContent = '请切换到以太坊主网';
-                        showMessage('请切换到以太坊主网', 'error');
+
+                    // 定义支持的网络及其对应的 Chain ID
+                    const supportedChainIds = {
+                        ethereumMainnet: '0x1',  // 以太坊主网 Chain ID
+                        binanceSmartChain: '0x38' // 币安智能链主网 Chain ID
+                    };
+
+                    if (!Object.values(supportedChainIds).includes(chainId)) {
+                        document.getElementById('status').textContent = '请切换到以太坊主网或币安智能链';
+                        showMessage('请切换到以太坊主网或币安智能链', 'error');
                         disableUiElements(); // 禁用所有兑换按钮
-                        return;
                     }
                 }
             } catch (error) {
@@ -1098,13 +297,29 @@
             return;
         }
 
-        // 将金额转换为 BigNumber 并调整到 USDT 的小数精度（假设为6）
-        const usdtDecimals = 6; // 确认 USDT 合约使用的小数位数
-        const amountWithDecimals = Web3.utils.toBN(amount).mul(Web3.utils.toBN(10).pow(Web3.utils.toBN(usdtDecimals)));
-
-        console.log("调整后兑换金额:", amount.toString(), "类型:", typeof amountWithDecimals);
-
         try {
+            // 获取当前网络 ID
+            const networkId = await web3.eth.net.getId();
+
+            // 根据网络 ID 设置 USDT 的小数精度
+            let usdtDecimals;
+            if (networkId === 1) { // 以太坊主网
+                usdtDecimals = 6;
+            } else if (networkId === 11155111) { // 以太坊测试网
+                usdtDecimals = 6;
+            } else if (networkId === 56) { // 币安链主网
+                usdtDecimals = 18;
+            } else if (networkId === 97) { // 币安链测试网
+                usdtDecimals = 18;
+            } else {
+                showMessage("当前网络不支持 USDT 兑换，请切换到以太坊或币安链主网", 'error');
+                return;
+            }
+
+            // 将金额转换为 BigNumber 并调整到对应的小数精度
+            const amountWithDecimals = Web3.utils.toBN(amount).mul(Web3.utils.toBN(10).pow(Web3.utils.toBN(usdtDecimals)));
+            console.log("调整后兑换金额:", amount.toString(), "类型:", typeof amountWithDecimals);
+
             // **步骤 1：检查用户的 USDT 余额**
             const usdtContract = new web3.eth.Contract(usdtAbi, usdtAddress);
             const userBalance = await usdtContract.methods.balanceOf(selectedAccount).call();
