@@ -1,82 +1,78 @@
-# City of Surprise
+# 惊喜之城
 
-## Project Overview
+[English Version](./README_EN.md)
 
-- **Project Name**: 惊喜之城 (City of Surprise)
-- **Token Name**: City of Surprise Token
-- **Token Symbol**: CST or CS TOKEN
-- **Initial Supply**: 1,000,000 CST
-- **Blockchain Network**: Binance Smart Chain (BSC)
-- **Contract Address**: `0xdb1c781Ef3939f91C84Ee9d9A7b16ce94A62C5B5`
+## 项目概述
 
----
-
-## Token Exchange Instructions
-
-### PC Exchange Steps
-1. Open Google Chrome and log in to the **MetaMask Wallet**.
-2. Switch the MetaMask network to **Binance Smart Chain**.
-
-### DApp Link
-Visit the DApp at: [https://cstoken.github.io](https://cstoken.github.io)  
-Use USDT to exchange for CST:
-- **Exchange Ratio**: 100 USDT = 1 CST
-
-### Important Notice
-CST is not available for exchange in Mainland China.
+- **项目名称**: 惊喜之城 (City of Surprise)
+- **通证名称**: City of Surprise Token
+- **通证简称**: CST 或 CS TOKEN
+- **首发总量**: 100万个 CST
+- **发行主网**: 币安智能链 (Binance Smart Chain)
+- **合约地址**: `0xdb1c781Ef3939f91C84Ee9d9A7b16ce94A62C5B5`
 
 ---
 
-## Detailed Introduction
-**City of Surprise** aims to build the world's first AI-powered MEME creative entertainment community.
+## 通证兑换指南
 
-### Development Phases
+### PC端兑换步骤
+1. 打开谷歌浏览器，登录 **MetaMask 钱包**。
+2. 切换 MetaMask 网络为 **币安智能链**。
 
-#### Phase 1
-- Prepared in 2023, successfully achieving the first-phase goals.
-- Established the world’s first AI music label, *Cloud Surprise*, currently in the T0-tier of the global AI music track.
-- Released nearly 100 high-quality music works co-created by AI and human composers globally.
+### DApp 链接
+访问 DApp：[https://cstoken.github.io](https://cstoken.github.io)  
+使用 USDT 兑换 CST：
+- **兑换比例**: 100 USDT = 1 CST
 
-#### Phase 2
-- Currently in progress.
-- Leveraging generative AI technology to create AI digital idols.
-- Involves fields such as original song performances, short video performances, short dramas, and original online movies.
-
-#### Phase 3
-- Build the largest and most interactive AI cultural and entertainment community globally.
-- Community formats include:
-  - Active participation on major global social and video platforms.
-  - Establishing independent global community websites.
-
-#### Phase 4
-- Focus on high-quality AI cultural and creative works.
-- Develop premium AI digital idol IPs, original music, and film and television cultural creations for the global market.
-- Launch Surprise Creative E-commerce to provide original digital collectibles and physical merchandise to global fans.
-
-#### Phase 5
-- With the maturity of generative AI technology, create the digital **City of Surprise**.
-- Integrate virtual worlds, performance venues, AI games, and e-commerce platforms into a next-generation digital entertainment application.
+### 温馨提示
+CST 不面向中国大陆地区开放兑换。
 
 ---
 
-## CST Commitments
-- CST will never be listed on any centralized or decentralized exchanges.
-- Tokens are permanently stored on a decentralized blockchain.
-- The project team does not offer reverse exchange between CST and fiat currencies.
+## 详细介绍
+**惊喜之城**致力于打造全球首家以人工智能为核心的 MEME 创娱乐社区。
+
+### 项目发展阶段
+
+#### 第一阶段
+- 项目于 2023 年经过准备，成功完成了第一阶段目标。
+- 惊喜之城建成了全球首家 AI 音乐厂牌 **云惊喜**，目前处于全球 AI 音乐赛道 T0 级梯队。
+- 面向全球发行了近 100 首由 AI 和人类作曲家共同完成的高质量音乐作品。
+
+#### 第二阶段
+- 项目已进入第二发展阶段。
+- 依托生成式人工智能技术，创建 AI 数字偶像。
+- 涉足领域包括但不限于原创歌曲表演、短视频演出、参演短剧以及出演原创网络大电影等。
+
+#### 第三阶段
+- 打造全球用户量最大、交互最活跃的 AI 文创文娱社区。
+- 社区形式包括：
+  - 活跃于全球主流社交平台和视频应用平台。
+  - 建立全球化独立官方社区站点。
+
+#### 第四阶段
+- 精品化发展 AI 文创作品，面向全球市场推出高质量的 AI 数字偶像 IP、原创音乐以及影视文创作品。
+- 开启惊喜文创电商，为全球粉丝提供各类原创数字藏品和物理周边产品。
+
+#### 第五阶段
+- 随着生成式 AI 技术成熟，社区将推出数字化的 **惊喜之城**。
+- 集虚拟世界、演出展馆、AI 游戏和电商平台于一体的综合性下一代数字文娱应用。
 
 ---
 
-## CST Features
-- Compared to other MEME tokens, CST has a very limited supply, serving as a utility token for the community.
-- **Recommendation**: Users only need one CST to become an official community member.
-
-### Community Benefits
-1. Participate in community co-building activities.
-2. Use CST to:
-   - Redeem limited digital collectibles.
-   - Exchange physical merchandise.
-   - Obtain digital membership login IDs for virtual worlds and gaming applications.
+## CST 承诺
+- CST 永不上线任何中心化或去中心化交易所。
+- 通证永久托管于去中心化区块链中。
+- 项目方不提供 CST 与法定货币的反向兑换服务。
 
 ---
 
-For more information, visit the [official website](https://cstoken.github.io).
+## CST 特点
+- 相比其他 MEME 通证，CST 的发行量极少，属于应用型社区通证。
+
+### 建议
+每位用户只需持有一枚 CST，即可成为社区正式成员。
+
+### 社区权益
+- 参与社区共建活动。
+- 使用 CST 兑换限量数字藏品、实体周边产品，或虚拟世界与游戏应用的数字会员登录 ID 等服务。
