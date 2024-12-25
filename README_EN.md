@@ -35,7 +35,7 @@ CST is not available for exchange in mainland China.
 ### Development Stages
 
 #### Stage One
-- In 2023, the project completed its preparation and achieved its first-stage goals.
+- The project was prepared in 2023, and through unremitting efforts, the first phase of development goals has been completed.
 - City of Surprise established the world’s first AI music label, **Cloud Surprise**, currently leading the global AI music industry.
 - Released nearly 100 high-quality music tracks co-created by AI and human composers globally.
 
