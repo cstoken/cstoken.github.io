@@ -1,6 +1,7 @@
 # City of Surprise
 
-[中文版](./README_CN.md)
+[中文版](./README_CN.md)    
+**DApp Exchange Link**：[https://cstoken.github.io](https://cstoken.github.io)  
 
 ## Project Overview
 
