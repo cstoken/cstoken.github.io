@@ -1,78 +1,78 @@
-# 惊喜之城
+# City of Surprise
 
-[English Version](./README_EN.md)
+[中文版](./README_CN.md)
 
-## 项目概述
+## Project Overview
 
-- **项目名称**: 惊喜之城 (City of Surprise)
-- **通证名称**: City of Surprise Token
-- **通证简称**: CST 或 CS TOKEN
-- **首发总量**: 100万个 CST
-- **发行主网**: 币安智能链 (Binance Smart Chain)
-- **合约地址**: `0xdb1c781Ef3939f91C84Ee9d9A7b16ce94A62C5B5`
-
----
-
-## 通证兑换指南
-
-### PC端兑换步骤
-1. 打开谷歌浏览器，登录 **MetaMask 钱包**。
-2. 切换 MetaMask 网络为 **币安智能链**。
-
-### DApp 链接
-访问 DApp：[https://cstoken.github.io](https://cstoken.github.io)  
-使用 USDT 兑换 CST：
-- **兑换比例**: 100 USDT = 1 CST
-
-### 温馨提示
-CST 不面向中国大陆地区开放兑换。
+- **Project Name**: City of Surprise
+- **Token Name**: City of Surprise Token
+- **Token Symbol**: CST or CS TOKEN
+- **Total Supply**: 1 million CST
+- **Mainnet**: Binance Smart Chain (BSC)
+- **Contract Address**: `0xdb1c781Ef3939f91C84Ee9d9A7b16ce94A62C5B5`
 
 ---
 
-## 详细介绍
-**惊喜之城**致力于打造全球首家以人工智能为核心的 MEME 文创娱乐社区。
+## Token Exchange Guide
 
-### 项目发展阶段
+### Steps for Exchange on PC
+1. Open Google Chrome and log in to **MetaMask Wallet**.
+2. Switch the MetaMask network to **Binance Smart Chain**.
 
-#### 第一阶段
-- 项目筹备于 2023 年，通过不懈努力，已完成第一阶段发展目标。
-- 惊喜之城建成了全球首家 AI 音乐厂牌 **云惊喜**，目前处于全球 AI 音乐赛道 T0 级梯队。
-- 面向全球发行了近 100 首由 AI 和人类作曲家共同完成的高质量音乐作品。
+### DApp Link
+Access the DApp: [https://cstoken.github.io](https://cstoken.github.io)  
+Exchange USDT for CST:
+- **Exchange Rate**: 100 USDT = 1 CST
 
-#### 第二阶段
-- 项目已进入第二发展阶段。
-- 依托生成式人工智能技术，创建 AI 数字偶像。
-- 涉足领域包括但不限于原创歌曲表演、短视频演出、参演短剧以及出演原创网络大电影等。
-
-#### 第三阶段
-- 打造全球用户量最大、交互最活跃的 AI 文创文娱社区。
-- 社区形式包括：
-  - 活跃于全球主流社交平台和视频应用平台。
-  - 建立全球化独立官方社区站点。
-
-#### 第四阶段
-- 精品化发展 AI 文创作品，面向全球市场推出高质量的 AI 数字偶像 IP、原创音乐以及影视文创作品。
-- 开启惊喜文创电商，为全球粉丝提供各类原创数字藏品和物理周边产品。
-
-#### 第五阶段
-- 随着生成式 AI 技术成熟，社区将推出数字化的 **惊喜之城**。
-- 集虚拟世界、演出展馆、AI 游戏和电商平台于一体的综合性下一代数字文娱应用。
+### Note
+CST is not available for exchange in mainland China.
 
 ---
 
-## CST 承诺
-- CST 永不上线任何中心化或去中心化交易所。
-- 通证永久托管于去中心化区块链中。
-- 项目方不提供 CST 与法定货币的反向兑换服务。
+## Detailed Introduction
+**City of Surprise** aims to build the world’s first MEME creative entertainment community powered by artificial intelligence.
+
+### Development Stages
+
+#### Stage One
+- The project was prepared in 2023, and through unremitting efforts, the first phase of development goals has been completed.
+- City of Surprise established the world’s first AI music label, **Cloud Surprise**, currently leading the global AI music industry.
+- Released nearly 100 high-quality music tracks co-created by AI and human composers globally.
+
+#### Stage Two
+- The project has entered its second development phase.
+- Leveraging generative AI technology to create AI digital idols.
+- Engaging in areas including but not limited to original song performances, short video appearances, short dramas, and original online movies.
+
+#### Stage Three
+- Building the world’s largest and most interactive AI creative entertainment community.
+- Community features:
+  - Active presence on global social media and video platforms.
+  - Establishment of a global independent official community site.
+
+#### Stage Four
+- Specializing in high-quality AI creative works for the global market, including AI digital idol IPs, original music, and cultural and creative works.
+- Launching Surprise Cultural & Creative e-commerce to offer various original digital collectibles and physical merchandise for global fans.
+
+#### Stage Five
+- As generative AI technology matures, the community will launch the digital **City of Surprise**.
+- A comprehensive next-generation digital entertainment application integrating a virtual world, performance venues, AI games, and an e-commerce platform.
 
 ---
 
-## CST 特点
-- 相比其他 MEME 通证，CST 的发行量极少，属于应用型社区通证。
+## CST Commitments
+- CST will never be listed on any centralized or decentralized exchange.
+- The tokens are permanently managed on decentralized blockchains.
+- The project team does not provide reverse exchange services between CST and fiat currencies.
 
-### 建议
-每位用户只需持有一枚 CST，即可成为社区正式成员。
+---
 
-### 社区权益
-- 参与社区共建活动。
-- 使用 CST 兑换限量数字藏品、实体周边产品，或虚拟世界与游戏应用的数字会员登录 ID 等服务。
+## CST Features
+- Compared to other MEME tokens, CST has a very limited supply and serves as a utility community token.
+
+### Recommendation
+Each user only needs to hold one CST to become a formal community member.
+
+### Community Benefits
+- Participate in community-building activities.
+- Use CST to redeem limited digital collectibles, physical merchandise, or services such as digital membership login IDs for virtual worlds and games.
