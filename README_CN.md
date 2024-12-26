@@ -1,6 +1,7 @@
 # 惊喜之城
 
-[English Version](./README.md)
+[English Version](./README.md)  
+**DApp兑换链接**：[https://cstoken.github.io](https://cstoken.github.io)  
 
 ## 项目概述
 
