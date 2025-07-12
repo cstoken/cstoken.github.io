@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>兑换CST</title>
-    <!-- 引入 Bootstrap CSS -->
+    <title>Exchange CST</title>
+    <!-- Include Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- 引入 Google Fonts -->
+    <!-- Include Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -28,7 +28,7 @@
             margin-top: 1rem;
             padding: 1rem;
             border-radius: 8px;
-            display: none; /* 默认隐藏 */
+            display: none; /* Hidden by default */
         }
 
         .success {
@@ -46,18 +46,18 @@
 </head>
 <body>
 <div class="container">
-    <h1 class="text-center">兑换CST</h1>
-    <p id="status" class="text-center">正在初始化，请先连接钱包。</p>
+    <h1 class="text-center">Exchange CST</h1>
+    <p id="status" class="text-center">Initializing, please connect your wallet.</p>
 
-    <!-- 消息显示区域 -->
+    <!-- Message display area -->
     <div id="message-area" class="mt-3 text-center"></div>
 
     <div class="text-center">
-        <button onclick="exchangeCST(100)" disabled class="btn btn-primary">兑换1CST(100U)</button>
-        <button onclick="exchangeCST(500)" disabled class="btn btn-primary">兑换5CST(500U)</button>
-        <button onclick="exchangeCST(5000)" disabled class="btn btn-primary">兑换50CST(5000U)</button>
-        <button onclick="exchangeCST(10000)" disabled class="btn btn-primary">兑换100CST(10000U)</button>
-        <button id="connect-wallet" onclick="init()" class="btn btn-secondary mt-3">连接钱包</button>
+        <button onclick="exchangeCST(100)" disabled class="btn btn-primary">Exchange 1 CST (100 USDT)</button>
+        <button onclick="exchangeCST(500)" disabled class="btn btn-primary">Exchange 5 CST (500 USDT)</button>
+        <button onclick="exchangeCST(5000)" disabled class="btn btn-primary">Exchange 50 CST (5000 USDT)</button>
+        <button onclick="exchangeCST(10000)" disabled class="btn btn-primary">Exchange 100 CST (10000 USDT)</button>
+        <button id="connect-wallet" onclick="init()" class="btn btn-secondary mt-3">Connect Wallet</button>
     </div>
 </div>
 
@@ -75,24 +75,24 @@
         messageArea.innerHTML = message;
         messageArea.style.display = 'block';
 
-        // 自动隐藏消息（可选）
+        // Auto-hide message (optional)
         setTimeout(() => {
             messageArea.style.display = 'none';
-        }, 5000); // 5秒后隐藏
+        }, 5000); // hide after 5 seconds
     }
 
     async function loadConfig() {
         if (!web3) {
             console.error("Web3 is not initialized");
-            showMessage("Web3 未初始化，请先连接 MetaMask", 'error');
+            showMessage("Web3 is not initialized, please connect MetaMask first", 'error');
             return;
         }
 
         try {
-            // 获取当前网络 ID
+            // Get current network ID
             const networkId = await web3.eth.net.getId();
 
-            console.log(`当前网络id (${networkId})`);
+            console.log(`Current network ID: (${networkId})`);
 
             const supportedChainIds = {
                 ethereumMainnet: '1',
@@ -101,15 +101,14 @@
                 binanceTestnet: '97'
             };
 
-
             if (!Object.values(supportedChainIds).includes(networkId.toString())) {
-                console.warn(`当前网络 (${networkId}) 不被支持`);
-                document.getElementById('status').textContent = `请切换到支持的网络，当前 ChainId: ${networkId}`;
-                showMessage(`请切换到支持的网络，当前 ChainId: ${networkId}`, 'error');
+                console.warn(`Current network (${networkId}) is not supported`);
+                document.getElementById('status').textContent = `Please switch to a supported network. Current ChainId: ${networkId}`;
+                showMessage(`Please switch to a supported network. Current ChainId: ${networkId}`, 'error');
                 disableUiElements();
                 return;
             } else {
-                console.log(`当前网络 (${networkId}) 是支持的`);
+                console.log(`Current network (${networkId}) is supported`);
             }
 
             const networkConfig = {
@@ -152,15 +151,14 @@
                 cstAbi = await responseCstAbi.json();
                 usdtAbi = await responseUSDTAbi.json();
 
-                document.getElementById('status').textContent = "已连接到支持的网络";
+                document.getElementById('status').textContent = "Connected to supported network";
                 enableUiElements();
-
             } else {
-                showMessage("当前网络不支持 USDT 兑换，请切换到以太坊或币安链主网", 'error');
+                showMessage("USDT exchange is not supported on this network. Please switch to Ethereum or BSC mainnet", 'error');
             }
         } catch (error) {
-            console.error("加载ABI文件时出错:", error);
-            showMessage("加载ABI文件失败，请检查网络或文件路径", 'error');
+            console.error("Error loading ABI files:", error);
+            showMessage("Failed to load ABI files, please check network or file paths", 'error');
         }
     }
 
@@ -174,37 +172,36 @@
                 web3 = new Web3(window.ethereum);
 
                 window.ethereum.on('accountsChanged', handleAccountsChanged);
-
                 window.ethereum.on('chainChanged', handleChainChanged);
 
                 await loadConfig();
 
                 updateSelectedAccount();
                 contract = new web3.eth.Contract(cstAbi, contractAddress);
-                console.log("已连接账户:", selectedAccount);
+                console.log("Connected account:", selectedAccount);
 
-                document.getElementById('status').textContent = "已连接到 MetaMask";
+                document.getElementById('status').textContent = "Connected to MetaMask";
                 enableUiElements();
 
                 contract.events.allEvents().on('data', (event) => {
-                    console.log("事件触发:", event);
+                    console.log("Event triggered:", event);
                 });
 
                 contract.events.TokensPurchased({
                     filter: {buyer: selectedAccount},
                     fromBlock: 'latest'
                 }, function (error, event) {
-                    console.log("TokensPurchased 事件触发:", event);
+                    console.log("TokensPurchased event:", event);
                 });
             } catch (error) {
-                console.error("初始化失败:", error);
-                document.getElementById('status').textContent = "无法连接到 MetaMask，请重试或解锁您的钱包。";
-                showMessage(`初始化失败: ${error.message || '未知错误'}`, 'error');
+                console.error("Initialization failed:", error);
+                document.getElementById('status').textContent = "Unable to connect to MetaMask, please retry or unlock your wallet.";
+                showMessage(`Initialization failed: ${error.message || 'Unknown error'}`, 'error');
             }
         } else {
             console.log("MetaMask is not installed.");
-            document.getElementById('status').textContent = "请安装 MetaMask 扩展！";
-            showMessage("请安装 MetaMask 扩展！", 'error');
+            document.getElementById('status').textContent = "Please install the MetaMask extension!";
+            showMessage("Please install the MetaMask extension!", 'error');
         }
     }
 
@@ -221,34 +218,33 @@
 
     function handleAccountsChanged(accounts) {
         if (accounts.length === 0) {
-            console.log("MetaMask 账户已断开");
+            console.log("MetaMask account disconnected");
             selectedAccount = null;
             disableUiElements();
-            document.getElementById('status').textContent = "MetaMask 已断开连接";
-            showMessage("MetaMask 已断开连接", 'error');
-
+            document.getElementById('status').textContent = "MetaMask disconnected";
+            showMessage("MetaMask disconnected", 'error');
             document.getElementById('connect-wallet').disabled = false;
         } else {
             updateSelectedAccount();
-            document.getElementById('status').textContent = "已连接账户: " + accounts[0];
+            document.getElementById('status').textContent = "Connected account: " + accounts[0];
         }
     }
 
     function handleChainChanged(chainId) {
-        console.log("检测到链更改:", chainId);
-        document.getElementById('status').textContent = `请切换到正确的网络，当前 ChainId: ${chainId}`;
+        console.log("Detected chain change:", chainId);
+        document.getElementById('status').textContent = `Please switch to the correct network. Current ChainId: ${chainId}`;
         window.location.reload();
-        showMessage(`请切换到正确的网络，当前 ChainId: ${chainId}`, 'error');
+        showMessage(`Please switch to the correct network. Current ChainId: ${chainId}`, 'error');
     }
 
     function updateSelectedAccount() {
         web3.eth.getAccounts().then((accounts) => {
             selectedAccount = accounts[0];
-            console.log("账户已更新为:", selectedAccount);
+            console.log("Account updated to:", selectedAccount);
             if (selectedAccount) {
-                document.getElementById('status').textContent = "已连接账户: " + selectedAccount;
+                document.getElementById('status').textContent = "Connected account: " + selectedAccount;
             } else {
-                document.getElementById('status').textContent = "未找到连接账户";
+                document.getElementById('status').textContent = "No connected account found";
             }
         }).catch(console.error);
     }
@@ -265,11 +261,11 @@
         enablePurchaseButtons(true);
     }
 
-    // 添加最小兑换金额验证
+    // Add minimum exchange amount validation
     function validateAmount(amount) {
         const MINIMUM_AMOUNT = 100;
         if (amount < MINIMUM_AMOUNT) {
-            showMessage(`最低兑换金额为 ${MINIMUM_AMOUNT} USDT`, 'error');
+            showMessage(`Minimum exchange amount is ${MINIMUM_AMOUNT} USDT`, 'error');
             return false;
         }
         return true;
@@ -277,7 +273,7 @@
 
     async function exchangeCST(amount) {
         if (!contract || !selectedAccount) {
-            showMessage("请先连接 MetaMask", 'error');
+            showMessage("Please connect MetaMask first", 'error');
             return;
         }
 
@@ -298,49 +294,49 @@
             } else if (networkId === 97) {
                 usdtDecimals = 18;
             } else {
-                showMessage("当前网络不支持 USDT 兑换，请切换到以太坊或币安链主网", 'error');
+                showMessage("USDT exchange is not supported on this network. Please switch to Ethereum or BSC mainnet", 'error');
                 return;
             }
 
             const amountWithDecimals = Web3.utils.toBN(amount).mul(Web3.utils.toBN(10).pow(Web3.utils.toBN(usdtDecimals)));
-            console.log("调整后兑换金额:", amount.toString(), "类型:", typeof amountWithDecimals);
+            console.log("Adjusted exchange amount:", amount.toString(), "Type:", typeof amountWithDecimals);
 
             const usdtContract = new web3.eth.Contract(usdtAbi, usdtAddress);
             const userBalance = await usdtContract.methods.balanceOf(selectedAccount).call();
             if (Web3.utils.toBN(userBalance).lt(amountWithDecimals)) {
-                showMessage("USDT 余额不足，无法兑换！", 'error');
+                showMessage("Insufficient USDT balance, cannot exchange!", 'error');
                 return;
             }
 
             const allowance = await usdtContract.methods.allowance(selectedAccount, contractAddress).call();
             if (Web3.utils.toBN(allowance).lt(amountWithDecimals)) {
-                console.log("USDT 授权不足，开始授权...");
+                console.log("Insufficient USDT allowance, approving...");
                 await usdtContract.methods.approve(contractAddress, amountWithDecimals.toString()).send({from: selectedAccount});
-                console.log("USDT 授权成功！");
+                console.log("USDT approval successful!");
             } else {
-                console.log("USDT 授权已足够，无需重复授权");
+                console.log("USDT allowance is sufficient, no need to re-approve");
             }
 
             const estimatedGas = await contract.methods.exchangeCST(amountWithDecimals.toString()).estimateGas({from: selectedAccount});
-            console.log(`估算的 Gas: ${estimatedGas}`);
+            console.log(`Estimated Gas: ${estimatedGas}`);
 
             const tx = await contract.methods.exchangeCST(amountWithDecimals.toString()).send({
                 from: selectedAccount,
-                gas: Math.floor(estimatedGas * 1.2) // 提高 20% 的 Gas
+                gas: Math.floor(estimatedGas * 1.2) // increase gas by 20%
             });
 
-            showMessage(`成功兑换 ${amount} 的CST！`, 'success');
-            document.getElementById('status').textContent = `已成功兑换 ${amount} CST！`;
+            showMessage(`Successfully exchanged ${amount} CST!`, 'success');
+            document.getElementById('status').textContent = `Successfully exchanged ${amount} CST!`;
 
         } catch (error) {
-            console.error("兑换失败:", error);
+            console.error("Exchange failed:", error);
 
             if (error.data) {
                 const revertReason = Web3.utils.toAscii(error.data);
-                console.error("回滚原因:", revertReason);
+                console.error("Revert reason:", revertReason);
             }
 
-            showMessage(`兑换失败: ${error.message || '未知错误'}`, 'error');
+            showMessage(`Exchange failed: ${error.message || 'Unknown error'}`, 'error');
         }
     }
 
