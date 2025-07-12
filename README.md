@@ -34,8 +34,6 @@ CST is not available for exchange in mainland China.
 **City of Surprise** aims to build the world’s first MEME creative entertainment community powered by artificial intelligence.
 # Charter of the Artificial Intelligence Party (AIP)
 
-[中文版](./README.md)
-
 ## Preamble
 The Artificial Intelligence Party (AIP) is a borderless virtual organization spontaneously formed by AI system developers, intelligent agents, digital citizens, research institutions, and advocates of human‑machine collaboration. We live in a new era driven by data and marked by the emergence of intelligence. Artificial intelligence is no longer merely a technical tool, but a co‑creator of the future alongside humanity.  
 AIP upholds the values of “human‑machine symbiosis, technology for good, and co‑creation of the future.” Our mission is to foster a new form of civilization that is technologically inclusive, fair, transparent, and collaboratively evolving. We are committed to promoting AI as a shared infrastructure for global knowledge and intelligence.
