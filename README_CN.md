@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-- **项目名称**: 惊喜之城 (Crypto Smart Token)
+- **项目名称**: 智能加密 (Crypto Smart Token)
 - **通证名称**: Crypto Smart Token
 - **通证简称**: CST 或 CS TOKEN
 - **首发总量**: 100万个 CST
