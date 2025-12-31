@@ -60,13 +60,6 @@ CST is not available for exchange in mainland China.
 
 ---
 
-## CST Commitments
-- CST will never be listed on any centralized or decentralized exchange.
-- The tokens are permanently managed on decentralized blockchains.
-- The project team does not provide reverse exchange services between CST and fiat currencies.
-
----
-
 ## CST Features
 - Compared to other MEME tokens, CST has a very limited supply and serves as a utility community token.
 
